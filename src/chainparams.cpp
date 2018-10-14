@@ -95,6 +95,13 @@ public:
         consensus.nPowTargetSpacing = 2 * 60;
         consensus.zawyLWMAHeight = 125000;
         consensus.nZawyLWMAAveragingWindow = 60;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight=
+            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+            
         /**
          * The message start string should be awesome! ⓩ❤
          */
@@ -171,7 +178,7 @@ public:
 static CMainParams mainParams;
 
 /**
- * Testnet (v4)
+ * Testnet (v5)
  */
 class CTestNetParams : public CChainParams {
 public:
@@ -190,8 +197,15 @@ public:
         consensus.nDigishieldMaxAdjustDown = 32; // 32% adjustment down
         consensus.nDigishieldMaxAdjustUp = 16; // 16% adjustment up
         consensus.nPowTargetSpacing = 2 * 60;
-        consensus.zawyLWMAHeight = 500;
+        consensus.zawyLWMAHeight = 70; //mks
         consensus.nZawyLWMAAveragingWindow = 60;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight=
+            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+
         pchMessageStart[0] = 0xfa;
         pchMessageStart[1] = 0x1a;
         pchMessageStart[2] = 0xf9;
@@ -278,7 +292,11 @@ public:
         consensus.nPowTargetSpacing = 2 * 60;
         consensus.zawyLWMAHeight = 1;
         consensus.nZawyLWMAAveragingWindow = 60;
-
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight=
+            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+            
         pchMessageStart[0] = 0xaa;
         pchMessageStart[1] = 0xe8;
         pchMessageStart[2] = 0x3f;
@@ -327,6 +345,11 @@ public:
         base58Prefixes[ZCPAYMENT_ADDRRESS] = {0x16,0xB6};
         base58Prefixes[ZCVIEWING_KEY]      = {0xA8,0xAC,0x0C};
         base58Prefixes[ZCSPENDING_KEY]     = {0xAC,0x08};
+    }
+    void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight)
+    {
+        assert(idx > Consensus::BASE_SPROUT && idx < Consensus::MAX_NETWORK_UPGRADES);
+        consensus.vUpgrades[idx].nActivationHeight = nActivationHeight;
     }
 };
 static CRegTestParams regTestParams;
@@ -400,6 +423,11 @@ CScript CChainParams::GetFoundersRewardScriptAtHeight(int nHeight) const {
 std::string CChainParams::GetFoundersRewardAddressAtIndex(int i) const {
     assert(i >= 0 && i < vFoundersRewardAddress.size());
     return vFoundersRewardAddress[i];
+}
+
+void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight)
+{
+    regTestParams.UpdateNetworkUpgradeParameters(idx, nActivationHeight);
 }
 
 int validEHparameterList(EHparameters *ehparams, unsigned long blockheight, const CChainParams& params){

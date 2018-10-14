@@ -780,6 +780,12 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex **pindex, b
 bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state, CBlockIndex **ppindex= NULL);
 
 
+/**
+ * When there are blocks in the active chain with missing data (e.g. if the
+ * activation height and branch ID of a particular upgrade have been altered),
+ * rewind the chainstate and remove them from the block index.
+ */
+bool RewindBlockIndex(const CChainParams& params);
 
 class CBlockFileInfo
 {
