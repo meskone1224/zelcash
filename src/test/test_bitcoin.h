@@ -2,6 +2,7 @@
 #define BITCOIN_TEST_TEST_BITCOIN_H
 
 #include "chainparamsbase.h"
+#include "consensus/upgrades.h"
 #include "pubkey.h"
 #include "txdb.h"
 
@@ -48,9 +49,14 @@ struct TestMemPoolEntryHelper
     double dPriority;
     unsigned int nHeight;
     bool hadNoDependencies;
+    bool spendsCoinbase;
+    unit32_t nBranchId;
+
      TestMemPoolEntryHelper() :
         nFee(0), nTime(0), dPriority(0.0), nHeight(1),
-        hadNoDependencies(false) { }
+        hadNoDependencies(false), spendsCoinbase(false),
+        nBranchId(SPROUT_BRANCH_ID) { }
+
 
      CTxMemPoolEntry FromTx(CMutableTransaction &tx, CTxMemPool *pool = NULL);
 
@@ -60,5 +66,7 @@ struct TestMemPoolEntryHelper
     TestMemPoolEntryHelper &Priority(double _priority) { dPriority = _priority; return *this; }
     TestMemPoolEntryHelper &Height(unsigned int _height) { nHeight = _height; return *this; }
     TestMemPoolEntryHelper &HadNoDependencies(bool _hnd) { hadNoDependencies = _hnd; return *this; }
+    TestMemPoolEntryHelper &SpendsCoinbase(bool _flag) { spendsCoinbase = _flag; return *this; }
+    TestMemPoolEntryHelper &BranchId(uint32_t _branchId) { nBranchId = _branchId; return *this; }
 };
 #endif

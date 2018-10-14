@@ -1286,7 +1286,22 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         CAmount nFees = nValueIn-nValueOut;
         double dPriority = view.GetPriority(tx, chainActive.Height());
 
-        CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height(), mempool.HasNoInputsOf(tx));
+        // Keep track of transactions that spend a coinbase, which we re-scan
+        // during reorgs to ensure COINBASE_MATURITY is still met.
+        bool fSpendsCoinbase = false;
+        BOOST_FOREACH(const CTxIn &txin, tx.vin) {
+            const CCoins *coins = view.AccessCoins(txin.prevout.hash);
+            if (coins->IsCoinBase()) {
+                fSpendsCoinbase = true;
+                break;
+            }
+        }
+        // Grab the branch ID we expect this transaction to commit to. We don't
+        // yet know if it does, but if the entry gets added to the mempool, then
+        // it has passed ContextualCheckInputs and therefore this is correct.
+        auto consensusBranchId = CurrentEpochBranchId(chainActive.Height() + 1, Params().GetConsensus());
+        
+        CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height(), mempool.HasNoInputsOf(tx), fSpendsCoinbase, consensusBranchId);
         unsigned int nSize = entry.GetTxSize();
 
         // Accept a tx if it contains joinsplits and has at least the default fee specified by z_sendmany.
@@ -2765,7 +2780,10 @@ void static UpdateTip(CBlockIndex *pindexNew) {
     }
 }
 
-/** Disconnect chainActive's tip. You probably want to call mempool.removeForReorg after this, with cs_main held. */
+/**
+ * Disconnect chainActive's tip. You probably want to call mempool.removeForReorg and
+ * mempool.removeWithoutBranchId after this, with cs_main held.
+ */
 bool static DisconnectTip(CValidationState &state, bool fBare = false) {
     CBlockIndex *pindexDelete = chainActive.Tip();
     assert(pindexDelete);
@@ -2828,6 +2846,7 @@ static int64_t nTimePostConnect = 0;
 /**
  * Connect a new block to chainActive. pblock is either NULL or a pointer to a CBlock
  * corresponding to pindexNew, to bypass loading it again from disk.
+ * You probably want to call mempool.removeWithoutBranchId after this, with cs_main held.
  */
 bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *pblock) {
     assert(pindexNew->pprev == chainActive.Tip());
@@ -3000,11 +3019,9 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
     // Disconnect active blocks which are no longer in the best chain.
     bool fBlocksDisconnected = false;
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
-         if (!DisconnectTip(state)) {
-            // Probably an AbortNode() error, but try to keep mempool consistent anyway
-            mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1);
+        if (!DisconnectTip(state))
             return false;
-        }
+        
         fBlocksDisconnected = true;
     }
 
@@ -3036,10 +3053,7 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
                     fContinue = false;
                     break;
                 } else {
-                    // A system error occurred (disk space, database error, ...).
-                     // Probably gonna shut down ASAP, but try to keep mempool consistent anyway
-                    if (fBlocksDisconnected)
-                        mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1);
+                    // A system error occurred (disk space, database error, ...)
                     return false;
                 }
             } else {
@@ -3053,8 +3067,10 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
         }
     }
     if (fBlocksDisconnected) {
-        mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1);
+            mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1, STANDARD_LOCKTIME_VERIFY_FLAGS);
     }
+    mempool.removeWithoutBranchId(
+        CurrentEpochBranchId(chainActive.Tip()->nHeight + 1, Params().GetConsensus()));
     mempool.check(pcoinsTip);
 
     // Callbacks/notifications for a new best chain.
@@ -3141,7 +3157,10 @@ bool InvalidateBlock(CValidationState& state, CBlockIndex *pindex) {
         // ActivateBestChain considers blocks already in chainActive
         // unconditionally valid already, so force disconnect away from it.
         if (!DisconnectTip(state)) {
-            mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1);
+                mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1, STANDARD_LOCKTIME_VERIFY_FLAGS);
+                mempool.removeWithoutBranchId(
+                    CurrentEpochBranchId(chainActive.Tip()->nHeight + 1, Params().GetConsensus()));
+
             return false;
         }
     }
@@ -3157,7 +3176,9 @@ bool InvalidateBlock(CValidationState& state, CBlockIndex *pindex) {
     }
 
     InvalidChainFound(pindex);
-    mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1);
+    mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1, STANDARD_LOCKTIME_VERIFY_FLAGS);
+    mempool.removeWithoutBranchId(
+        CurrentEpochBranchId(chainActive.Tip()->nHeight + 1, Params().GetConsensus()));
     return true;
 }
 

@@ -19,16 +19,22 @@
 using namespace std;
 
 CTxMemPoolEntry::CTxMemPoolEntry():
-    nFee(0), nTxSize(0), nModSize(0), nUsageSize(0), nTime(0), dPriority(0.0), hadNoDependencies(false)
+     nFee(0), nTxSize(0), nModSize(0), nUsageSize(0), nTime(0), dPriority(0.0),
+    hadNoDependencies(false), spendsCoinbase(false)
+
 {
     nHeight = MEMPOOL_HEIGHT;
 }
 
 CTxMemPoolEntry::CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee,
-                                 int64_t _nTime, double _dPriority,
-                                 unsigned int _nHeight, bool poolHasNoInputsOf):
+                                int64_t _nTime, double _dPriority,
+                                unsigned int _nHeight, bool poolHasNoInputsOf,
+                                bool _spendsCoinbase, uint32_t _nBranchId):
+
+
     tx(_tx), nFee(_nFee), nTime(_nTime), dPriority(_dPriority), nHeight(_nHeight),
-    hadNoDependencies(poolHasNoInputsOf)
+    hadNoDependencies(poolHasNoInputsOf),
+    spendsCoinbase(_spendsCoinbase), nBranchId(_nBranchId)
 {
     nTxSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
     nModSize = tx.CalculateModifiedSize(nTxSize);
@@ -308,16 +314,16 @@ void CTxMemPool::remove(const CTransaction &origTx, std::list<CTransaction>& rem
     }
 }
 
-void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMemPoolHeight)
+void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMemPoolHeight, int flags)
 {
     // Remove transactions spending a coinbase which are now immature and no-longer-final-transactions
     LOCK(cs);
     list<CTransaction> transactionsToRemove;
      for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
         const CTransaction& tx = it->GetTx();
-         if (!IsFinalTx(tx, nMemPoolHeight, GetAdjustedTime())) {
+        if (!CheckFinalTx(tx, flags)) {
             transactionsToRemove.push_back(tx);
-        } else {
+        } else if (it->GetSpendsCoinbase()) {
             BOOST_FOREACH(const CTxIn& txin, tx.vin) {
                 indexed_transaction_set::const_iterator it2 = mapTx.find(txin.prevout.hash);
                 if (it2 != mapTx.end())
@@ -420,6 +426,25 @@ void CTxMemPool::removeForBlock(const std::vector<CTransaction>& vtx, unsigned i
     minerPolicyEstimator->processBlock(nBlockHeight, entries, fCurrentEstimate);
 }
 
+/**
+ * Called whenever the tip changes. Removes transactions which don't commit to
+ * the given branch ID from the mempool.
+ */
+void CTxMemPool::removeWithoutBranchId(uint32_t nMemPoolBranchId)
+{
+    LOCK(cs);
+    std::list<CTransaction> transactionsToRemove;
+     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
+        const CTransaction& tx = it->GetTx();
+        if (it->GetValidatedBranchId() != nMemPoolBranchId) {
+            transactionsToRemove.push_back(tx);
+        }
+    }
+     for (const CTransaction& tx : transactionsToRemove) {
+        std::list<CTransaction> removed;
+        remove(tx, removed, true);
+    }
+}
 void CTxMemPool::clear()
 {
     LOCK(cs);
