@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
+
  #include "chainparams.h"
 #include "consensus/upgrades.h"
+
+#include <boost/optional.hpp>
+
  class UpgradesTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
@@ -112,4 +116,28 @@ protected:
     EXPECT_TRUE(IsActivationHeightForAnyUpgrade(nActivationHeight, params));
     EXPECT_FALSE(IsActivationHeightForAnyUpgrade(nActivationHeight + 1, params));
     EXPECT_FALSE(IsActivationHeightForAnyUpgrade(1000000, params));
+}
+
+TEST_F(UpgradesTest, NextActivationHeight) {
+    SelectParams(CBaseChainParams::REGTEST);
+    const Consensus::Params& params = Params().GetConsensus();
+     // Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT
+    EXPECT_EQ(NextActivationHeight(-1, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(0, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(1, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(1000000, params), boost::none);
+     UpdateNetworkUpgradeParameters(Consensus::UPGRADE_TESTDUMMY, Consensus::NetworkUpgrade::ALWAYS_ACTIVE);
+     EXPECT_EQ(NextActivationHeight(-1, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(0, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(1, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(1000000, params), boost::none);
+     int nActivationHeight = 100;
+    UpdateNetworkUpgradeParameters(Consensus::UPGRADE_TESTDUMMY, nActivationHeight);
+     EXPECT_EQ(NextActivationHeight(-1, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(0, params), nActivationHeight);
+    EXPECT_EQ(NextActivationHeight(1, params), nActivationHeight);
+    EXPECT_EQ(NextActivationHeight(nActivationHeight - 1, params), nActivationHeight);
+    EXPECT_EQ(NextActivationHeight(nActivationHeight, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(nActivationHeight + 1, params), boost::none);
+    EXPECT_EQ(NextActivationHeight(1000000, params), boost::none);
 }

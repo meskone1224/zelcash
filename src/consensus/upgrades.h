@@ -1,9 +1,14 @@
 // Copyright (c) 2018 The Zcash developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
  #ifndef ZELCASH_CONSENSUS_UPGRADES_H
 #define ZELCASH_CONSENSUS_UPGRADES_H
- #include "consensus/params.h"
+
+#include "consensus/params.h"
+
+#include <boost/optional.hpp>
+
  enum UpgradeState {
     UPGRADE_DISABLED,
     UPGRADE_PENDING,
@@ -62,4 +67,13 @@ bool IsActivationHeight(
 bool IsActivationHeightForAnyUpgrade(
     int nHeight,
     const Consensus::Params& params);
+
+/**
+ * Returns the activation height for the next upgrade after the given block height,
+ * or boost::none if there are no more known upgrades.
+ */
+boost::optional<int> NextActivationHeight(
+    int nHeight,
+    const Consensus::Params& params);
+
  #endif // ZELCASH_CONSENSUS_UPGRADES_H
