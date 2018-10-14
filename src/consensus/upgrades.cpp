@@ -38,13 +38,15 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
      if (nActivationHeight == Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT) {
         return UPGRADE_DISABLED;
     } else if (nHeight >= nActivationHeight) {
-        // From ZIP ???:
+        // From ZIP 200:
         //
         // ACTIVATION_HEIGHT
-        //     The block height at which the network upgrade rules will come into effect.
+        //     The non-zero block height at which the ntwork upgrade rules will come 
+        //     into effect, and be enfroced as part of the blockchain consensus.
         //
         //     For removal of ambiguity, the block at height ACTIVATION_HEIGHT - 1 is
-        //     subject to the pre-upgrade consensus rules.
+        //     subject to the pre-upgrade consensus rules, and would be the last common
+        //     block in the event of a persistent pre-upgrade branch. 
         return UPGRADE_ACTIVE;
     } else {
         return UPGRADE_PENDING;
@@ -110,7 +112,7 @@ boost::optional<int> NextActivationHeight(
     if (nHeight < 0) {
         return boost::none;
     }
-    
+
      // Don't count Sprout as an activation height
     for (auto idx = Consensus::BASE_SPROUT + 1; idx < Consensus::MAX_NETWORK_UPGRADES; idx++) {
         if (NetworkUpgradeState(nHeight, params, Consensus::UpgradeIndex(idx)) == UPGRADE_PENDING) {
