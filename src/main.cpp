@@ -63,6 +63,9 @@ bool fExperimentalMode = false;
 bool fImporting = false;
 bool fReindex = false;
 bool fTxIndex = false;
+bool fAddressIndex = false;
+bool fTimestampIndex = false;
+bool fSpentIndex = false;
 bool fHavePruned = false;
 bool fPruneMode = false;
 bool fIsBareMultisigStd = true;
@@ -2486,7 +2489,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
             txdata.emplace_back(tx);
 
-            if (!tx.IsCoinBase)))
+            if (!tx.IsCoinBase())
             {
 
             nFees += view.GetValueIn(tx)-tx.GetValueOut();
