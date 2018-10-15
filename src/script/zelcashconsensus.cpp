@@ -5,6 +5,7 @@
 
 #include "zelcashconsensus.h"
 
+#include "consensus/upgrades.h"
 #include "primitives/transaction.h"
 #include "pubkey.h"
 #include "script/interpreter.h"
@@ -87,7 +88,8 @@ int zelcashconsensus_verify_script(const unsigned char *scriptPubKey, unsigned i
         
         CachedHashes cachedHashes(tx);
             CAmount am(0);
-        return VerifyScript(tx.vin[nIn].scriptSig, CScript(scriptPubKey, scriptPubKey + scriptPubKeyLen), flags, TransactionSignatureChecker(&tx, nIn, am, cachedHashes), NULL);
+        uint32_t consensusBranchId = SPROUT_BRANCH_ID;
+        return VerifyScript(tx.vin[nIn].scriptSig, CScript(scriptPubKey, scriptPubKey + scriptPubKeyLen), flags, TransactionSignatureChecker(&tx, nIn, am, txdata), consensusBranchId, NULL);
     } catch (const std::exception&) {
         return set_error(err, zelcashconsensus_ERR_TX_DESERIALIZE); // Error deserializing
     }
