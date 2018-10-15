@@ -158,9 +158,6 @@ bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& fromPu
     SignatureData data;
     assert(tx.vin.size() > nIn);
     data.scriptSig = tx.vin[nIn].scriptSig;
-    if (tx.wit.vtxinwit.size() > nIn) {
-        data.scriptWitness = tx.wit.vtxinwit[nIn].scriptWitness;
-    }
     return data;
 }
 

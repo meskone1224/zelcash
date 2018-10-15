@@ -1133,7 +1133,6 @@ uint256 SignatureHash(
         throw logic_error("input index is out of range");
     }
 
-     if (sigversion == SIGVERSION_WITNESS_V0) {
     auto sigversion = SignatureHashVersion(txTo);
 
      if (sigversion == SIGVERSION_OVERWINTER) {
@@ -1198,7 +1197,6 @@ uint256 SignatureHash(
         }
 
          return ss.GetHash();
-         
     }
 
     // Check for invalid use of SIGHASH_SINGLE
@@ -1218,16 +1216,17 @@ uint256 SignatureHash(
     return ss.GetHash();
 }
 
+bool TransactionSignatureChecker::VerifySignature(
+    const std::vector<unsigned char>& vchSig, const CPubKey& pubkey, const uint256& sighash) const
+{
+    return pubkey.Verify(sighash, vchSig);
+}
+
 bool TransactionSignatureChecker::CheckSig(
     const vector<unsigned char>& vchSigIn,
     const vector<unsigned char>& vchPubKey,
     const CScript& scriptCode,
     uint32_t consensusBranchId) const
-{
-    return pubkey.Verify(sighash, vchSig);
-}
-
-bool TransactionSignatureChecker::CheckSig(const vector<unsigned char>& vchSigIn, const vector<unsigned char>& vchPubKey, const CScript& scriptCode, uint32_t consensusBranchId) const
 {
     CPubKey pubkey(vchPubKey);
     if (!pubkey.IsValid())

@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(DoS_mapOrphans)
         tx.vout.resize(1);
         tx.vout[0].nValue = 1*CENT;
         tx.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
-        SignSignature(keystore, txPrev, tx, 0, SIGHASH_ALL);
+        SignSignature(keystore, txPrev, tx, 0, SIGHASH_ALL, consensusBranchId);
 
         AddOrphanTx(tx, i);
     }
