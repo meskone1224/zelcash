@@ -214,8 +214,8 @@ public:
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
             Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170004;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
-            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+                consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = 100;
+
 
         pchMessageStart[0] = 0xfa;
         pchMessageStart[1] = 0x1a;
