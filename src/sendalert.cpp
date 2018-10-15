@@ -77,8 +77,10 @@ void ThreadSendAlert()
 
     // These versions are protocol versions
     // 170002 : 1.0.0
-    alert.nMinVer       = 170002;
-    alert.nMaxVer       = 170003;
+    // 170003 : 1.1.0
+    // 170004 : 1.2.0
+    alert.nMinVer       = 170003;
+    alert.nMaxVer       = 170004;
 
     //
     // main.cpp:
