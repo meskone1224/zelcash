@@ -89,7 +89,13 @@ int zelcashconsensus_verify_script(const unsigned char *scriptPubKey, unsigned i
         CachedHashes cachedHashes(tx);
             CAmount am(0);
         uint32_t consensusBranchId = SPROUT_BRANCH_ID;
-        return VerifyScript(tx.vin[nIn].scriptSig, CScript(scriptPubKey, scriptPubKey + scriptPubKeyLen), flags, TransactionSignatureChecker(&tx, nIn, am, txdata), consensusBranchId, NULL);
+        return VerifyScript(
+            tx.vin[nIn].scriptSig,
+            CScript(scriptPubKey, scriptPubKey + scriptPubKeyLen),
+            flags,
+            TransactionSignatureChecker(&tx, nIn, am, txdata),
+            consensusBranchId,
+            NULL);
     } catch (const std::exception&) {
         return set_error(err, zelcashconsensus_ERR_TX_DESERIALIZE); // Error deserializing
     }
