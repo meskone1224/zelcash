@@ -379,20 +379,16 @@ public:
             READWRITE(header);
             *const_cast<bool*>(&fOverwintered) = header >> 31;
             *const_cast<int32_t*>(&this->nVersion) = header & 0x7FFFFFFF;
-        } else {
-            // When serializing v1 and v2, the 4 byte header is nVersion
-            uint32_t header = this->nVersion;
-            // When serializing Overwintered tx, the 4 byte header is the combination of fOverwintered and nVersion
-            if (fOverwintered) {
-                header |= 1 << 31;
-            }
+         } else {
+            uint32_t header = GetHeader();
             READWRITE(header);
         }
         nVersion = this->nVersion;
         if (fOverwintered) {
             READWRITE(*const_cast<uint32_t*>(&this->nVersionGroupId));
         }
-         bool isOverwinterV3 = fOverwintered &&
+
+        bool isOverwinterV3 = fOverwintered &&
                               nVersionGroupId == OVERWINTER_VERSION_GROUP_ID &&
                               nVersion == 3;
         if (fOverwintered && !isOverwinterV3) {
@@ -494,7 +490,12 @@ struct CMutableTransaction
             fOverwintered = header >> 31;
             this->nVersion = header & 0x7FFFFFFF;
         } else {
-            uint32_t header = GetHeader();
+            // When serializing v1 and v2, the 4 byte header is nVersion
+            uint32_t header = this->nVersion;
+            // When serializing Overwintered tx, the 4 byte header is the combination of fOverwintered and nVersion
+            if (fOverwintered) {
+                header |= 1 << 31;
+            }
             READWRITE(header);
         }
         nVersion = this->nVersion;
