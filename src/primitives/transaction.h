@@ -426,6 +426,16 @@ public:
         return hash;
     }
 
+     uint32_t GetHeader() const {
+        // When serializing v1 and v2, the 4 byte header is nVersion
+        uint32_t header = this->nVersion;
+        // When serializing Overwintered tx, the 4 byte header is the combination of fOverwintered and nVersion
+        if (fOverwintered) {
+            header |= 1 << 31;
+        }
+        return header;
+    }
+
     // Return sum of txouts.
     CAmount GetValueOut() const;
     // GetValueIn() is a method on CCoinsViewCache, because
@@ -486,19 +496,14 @@ struct CMutableTransaction
             fOverwintered = header >> 31;
             this->nVersion = header & 0x7FFFFFFF;
         } else {
-            // When serializing v1 and v2, the 4 byte header is nVersion
-            uint32_t header = this->nVersion;
-            // When serializing Overwintered tx, the 4 byte header is the combination of fOverwintered and nVersion
-            if (fOverwintered) {
-                header |= 1 << 31;
-            }
+            uint32_t header = GetHeader();
             READWRITE(header);
         }
         nVersion = this->nVersion;
         if (fOverwintered) {
             READWRITE(nVersionGroupId);
         }
-        
+
          bool isOverwinterV3 = fOverwintered &&
                               nVersionGroupId == OVERWINTER_VERSION_GROUP_ID &&
                               nVersion == 3;
