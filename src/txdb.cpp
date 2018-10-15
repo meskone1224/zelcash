@@ -521,8 +521,9 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nSproutValue   = diskindex.nSproutValue;
 
                 auto header = pindexNew->GetBlockHeader();
-                if (!CheckEquihashSolution(&header, Params()))
-                    return error("LoadBlockIndex(): CheckEquihashSolution failed: %s", pindexNew->ToString());
+                if (header.GetHash() != pindexNew->GetBlockHash())
+                    return error("LoadBlockIndex(): block header inconsistency detected: on-disk = %s, in-memory = %s",
+                       diskindex.ToString(),  pindexNew->ToString());
                 if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, Params().GetConsensus()))
                     return error("LoadBlockIndex(): CheckProofOfWork failed: %s", pindexNew->ToString());
 
