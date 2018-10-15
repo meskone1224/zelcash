@@ -63,9 +63,6 @@ bool fExperimentalMode = false;
 bool fImporting = false;
 bool fReindex = false;
 bool fTxIndex = false;
-bool fAddressIndex = false;
-bool fTimestampIndex = false;
-bool fSpentIndex = false;
 bool fHavePruned = false;
 bool fPruneMode = false;
 bool fIsBareMultisigStd = true;
@@ -649,6 +646,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans) EXCLUSIVE_LOCKS_REQUIRE
 bool IsStandardTx(const CTransaction& tx, string& reason, const int nHeight)
 {
     bool isOverwinter = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
+     
      if (isOverwinter) {
         // Overwinter standard rules apply
         if (tx.nVersion > CTransaction::OVERWINTER_MAX_CURRENT_VERSION || tx.nVersion < CTransaction::OVERWINTER_MIN_CURRENT_VERSION) {
@@ -661,6 +659,7 @@ bool IsStandardTx(const CTransaction& tx, string& reason, const int nHeight)
             reason = "version";
             return false;
         }
+    }
 
     BOOST_FOREACH(const CTxIn& txin, tx.vin)
     {
@@ -956,8 +955,7 @@ bool CheckTransactionWithoutProofVerification(const CTransaction& tx, CValidatio
 {
     // Basic checks that don't depend on any context
 
-    // Check transaction version
-/**
+    /**
      * Previously:
      * 1. The consensus rule below was:
      *        if (tx.nVersion < SPROUT_MIN_TX_VERSION) { ... }
@@ -6262,6 +6260,7 @@ public:
 CMutableTransaction CreateNewContextualCMutableTransaction(const Consensus::Params& consensusParams, int nHeight)
 {
     CMutableTransaction mtx;
+
      bool isOverwintered = NetworkUpgradeActive(nHeight, consensusParams, Consensus::UPGRADE_OVERWINTER);
     if (isOverwintered) {
         mtx.fOverwintered = true;
