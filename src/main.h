@@ -47,7 +47,8 @@ class CInv;
 class CScriptCheck;
 class CValidationInterface;
 class CValidationState;
-class CachedHashes;
+class PrecomputedTransactionData;
+
 struct CNodeStateStats;
 
 /** Default for -blockmaxsize and -blockminsize, which control the range of sizes the mining code will create **/
@@ -742,7 +743,7 @@ private:
     bool cacheStore;
     uint32_t consensusBranchId;
     ScriptError error;
-    CachedHashes *cachedHashes;
+    PrecomputedTransactionData *cachedHashes;
 
 
 public:

@@ -1101,7 +1101,7 @@ uint256 GetJoinSplitsHash(const CTransaction& txTo) {
 
 } // anon namespace
 
-CachedHashes::CachedHashes(const CTransaction& txTo)
+PrecomputedTransactionData::PrecomputedTransactionData(const CTransaction& txTo)
 {
     hashPrevouts = GetPrevoutHash(txTo);
     hashSequence = GetSequenceHash(txTo);
@@ -1196,7 +1196,7 @@ uint256 SignatureHash(
             ss << amount;
             ss << txTo.vin[nIn].nSequence;
         }
-        
+
          return ss.GetHash();
          
     }

@@ -73,7 +73,7 @@ TEST(Validation, ContextualCheckInputsPassesWithCoinbase) {
 
     auto consensusBranchId = SPROUT_BRANCH_ID;
     CValidationState state;
-    CachedHashes cachedHashes(tx);
+    PrecomputedTransactionData txdata(tx);
     EXPECT_TRUE(ContextualCheckInputs(tx, state, view, false, 0, false, txdata, Params(CBaseChainParams::MAIN).GetConsensus(), consensusBranchId));
 }
 

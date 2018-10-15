@@ -88,11 +88,11 @@ enum
     SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY = (1U << 9),
 };
 
-struct CachedHashes
+struct PrecomputedTransactionData
 {
     uint256 hashPrevouts, hashSequence, hashOutputs, hashJoinSplits;;
 
-     CachedHashes(const CTransaction& tx);
+    PrecomputedTransactionData(const CTransaction& tx);
 };
 
 enum SigVersion
@@ -117,7 +117,8 @@ public:
         const std::vector<unsigned char>& scriptSig,
         const std::vector<unsigned char>& vchPubKey,
         const CScript& scriptCode,
-        uint32_t consensusBranchId) const    {
+        uint32_t consensusBranchId) const    
+    {
         return false;
     }
 
@@ -135,15 +136,14 @@ private:
     const CTransaction* txTo;
     unsigned int nIn;
 const CAmount amount;
-const CachedHashes* cachedHashes;
-
+const PrecomputedTransactionData* txdata;
 
 protected:
     virtual bool VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& vchPubKey, const uint256& sighash) const;
 
 public:
-    TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), cachedHashes(NULL) {}
-    TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, const CachedHashes& cachedHashesIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), cachedHashes(&cachedHashesIn) {}
+    TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(NULL) {}
+    TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, const PrecomputedTransactionData& txdataIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(&txdataIn) {}
     bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, uint32_t consensusBranchId) const;
     bool CheckLockTime(const CScriptNum& nLockTime) const;
 };
