@@ -267,7 +267,7 @@ typedef std::map<JSOutPoint, CNoteData> mapNoteData_t;
 struct CNotePlaintextEntry
 {
     JSOutPoint jsop;
-    libzcash::PaymentAddress address;
+    libzelcash::PaymentAddress address;
     libzelcash::NotePlaintext plaintext;
 };
 
@@ -1127,10 +1127,10 @@ public:
                           int minDepth=1,
                           bool ignoreSpent=true,
                           bool ignoreUnspendable=true);
-                          
+
     /* Find notes filtered by payment addresses, min depth, ability to spend */
     void GetFilteredNotes(std::vector<CNotePlaintextEntry>& outEntries,
-                          std::set<libzcash::PaymentAddress>& filterAddresses,
+                          std::set<libzelcash::PaymentAddress>& filterAddresses,
                           int minDepth=1,
                           bool ignoreSpent=true,
                           bool ignoreUnspendable=true);

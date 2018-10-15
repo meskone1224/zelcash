@@ -743,7 +743,7 @@ private:
     bool cacheStore;
     uint32_t consensusBranchId;
     ScriptError error;
-    PrecomputedTransactionData *cachedHashes;
+    PrecomputedTransactionData *txdata;
 
 
 public:
@@ -763,7 +763,7 @@ public:
         std::swap(cacheStore, check.cacheStore);
         std::swap(consensusBranchId, check.consensusBranchId);
         std::swap(error, check.error);
-        std::swap(cachedHashes, check.cachedHashes);
+        std::swap(txdata, check.txdata);
 
     }
 

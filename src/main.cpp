@@ -646,11 +646,6 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans) EXCLUSIVE_LOCKS_REQUIRE
 }
 
 
-
-
-
-
-
 bool IsStandardTx(const CTransaction& tx, string& reason, const int nHeight)
 {
     bool isOverwinter = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
@@ -2491,7 +2486,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                                  REJECT_INVALID, "bad-blk-sigops");
             }
 
-            cachedHashes.emplace_back(tx);
+            txdata.emplace_back(tx);
 
             if (!tx.IsCoinBase)))
             {
