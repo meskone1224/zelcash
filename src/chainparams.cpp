@@ -22,6 +22,11 @@
 #include "crypto/equihash.h"
 static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesisOutputScript, uint32_t nTime, const uint256& nNonce, const std::vector<unsigned char>& nSolution, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
+    // To create a genesis block for a new chain which is Overwintered:
+    //   txNew.nVersion = 3
+    //   txNew.fOverwintered = true
+    //   txNew.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID
+    //   txNew.nExpiryHeight = <default value>
     CMutableTransaction txNew;
     txNew.nVersion = 1;
     txNew.vin.resize(1);
@@ -95,6 +100,16 @@ public:
         consensus.nPowTargetSpacing = 2 * 60;
         consensus.zawyLWMAHeight = 125000;
         consensus.nZawyLWMAAveragingWindow = 60;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170003;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
+            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170003;
+        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170004;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+
         /**
          * The message start string should be awesome! ⓩ❤
          */
@@ -192,6 +207,16 @@ public:
         consensus.nPowTargetSpacing = 2 * 60;
         consensus.zawyLWMAHeight = 500;
         consensus.nZawyLWMAAveragingWindow = 60;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170003;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
+            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170003;
+        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170004;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = 210000;
+
+
         pchMessageStart[0] = 0xfa;
         pchMessageStart[1] = 0x1a;
         pchMessageStart[2] = 0xf9;
@@ -278,6 +303,15 @@ public:
         consensus.nPowTargetSpacing = 2 * 60;
         consensus.zawyLWMAHeight = 1;
         consensus.nZawyLWMAAveragingWindow = 60;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170003;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
+            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170003;
+        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170004;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
 
         pchMessageStart[0] = 0xaa;
         pchMessageStart[1] = 0xe8;
@@ -327,6 +361,12 @@ public:
         base58Prefixes[ZCPAYMENT_ADDRRESS] = {0x16,0xB6};
         base58Prefixes[ZCVIEWING_KEY]      = {0xA8,0xAC,0x0C};
         base58Prefixes[ZCSPENDING_KEY]     = {0xAC,0x08};
+    }
+
+    void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight)
+    {
+        assert(idx > Consensus::BASE_SPROUT && idx < Consensus::MAX_NETWORK_UPGRADES);
+        consensus.vUpgrades[idx].nActivationHeight = nActivationHeight;
     }
 };
 static CRegTestParams regTestParams;
@@ -417,4 +457,9 @@ int validEHparameterList(EHparameters *ehparams, unsigned long blockheight, cons
     ehparams[0]=params.eh_epoch_2_params();
     ehparams[1]=params.eh_epoch_1_params();
     return 2;
+}
+
+void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight)
+{
+    regTestParams.UpdateNetworkUpgradeParameters(idx, nActivationHeight);
 }
