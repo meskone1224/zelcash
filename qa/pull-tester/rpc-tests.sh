@@ -40,10 +40,12 @@ testScripts=(
     'fundrawtransaction.py'
     'signrawtransactions.py'
     'walletbackup.py'
-    'wallet_overwintertx.py'
     'key_import_export.py'
     'nodehandling.py'
     'reindex.py'
+    'addressindex.py'
+    'timestampindex.py'
+    'spentindex.py'
     'decodescript.py'
     'disablewallet.py'
     'zcjoinsplit.py'
@@ -54,6 +56,7 @@ testScripts=(
     'bip65-cltv-p2p.py'
     'bipdersig-p2p.py'
     'overwinter_peer_management.py'
+
 );
 testScriptsExt=(
     'getblocktemplate_longpoll.py'

@@ -9,8 +9,8 @@
 #include "checkpoints.h"
 #include "coincontrol.h"
 #include "consensus/upgrades.h"
-#include "consensus/consensus.h"
 #include "consensus/validation.h"
+#include "consensus/consensus.h"
 #include "init.h"
 #include "main.h"
 #include "net.h"
@@ -2524,6 +2524,7 @@ bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount &nFeeRet, int& nC
 
     CReserveKey reservekey(this);
     CWalletTx wtx;
+
     if (!CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePosRet, strFailReason, &coinControl, false))
         return false;
 
@@ -2588,7 +2589,6 @@ bool CWallet::CreateTransaction(const vector<CRecipient>& vecSend, CWalletTx& wt
             txNew.nExpiryHeight = nextBlockHeight + expiryDelta;
         }
     }
-    
 
     // Discourage fee sniping.
     //
@@ -2806,7 +2806,6 @@ bool CWallet::CreateTransaction(const vector<CRecipient>& vecSend, CWalletTx& wt
                     } else {
                         UpdateTransaction(txNew, nIn, sigdata);
                     }
-
                     nIn++;
                 }
 
@@ -2816,6 +2815,7 @@ bool CWallet::CreateTransaction(const vector<CRecipient>& vecSend, CWalletTx& wt
                 if (!sign) {
                     BOOST_FOREACH (CTxIn& vin, txNew.vin)
                         vin.scriptSig = CScript();
+    
                 }
 
                 // Embed the constructed transaction data in wtxNew.
@@ -3681,7 +3681,7 @@ void CWallet::GetFilteredNotes(std::vector<CNotePlaintextEntry> & outEntries, st
     GetFilteredNotes(outEntries, filterAddresses, minDepth, ignoreSpent, ignoreUnspendable);
 }
 
-/**
+ /**
  * Find notes in the wallet filtered by payment addresses, min depth and ability to spend.
  * These notes are decrypted and added to the output parameter vector, outEntries.
  */

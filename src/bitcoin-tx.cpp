@@ -352,7 +352,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& strInput)
         (pos == (strInput.size() - 1)))
         throw runtime_error("Invalid sighash flag separator");
 
-    // extract and validate HEIGHT
+     // extract and validate HEIGHT
     string strHeight = strInput.substr(0, pos);
     int nHeight = atoi(strHeight);
     if (nHeight <= 0) {
@@ -454,7 +454,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& strInput)
 
     bool fHashSingle = ((nHashType & ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);
 
-    // Grab the consensus branch ID for the given height
+     // Grab the consensus branch ID for the given height
     auto consensusBranchId = CurrentEpochBranchId(nHeight, Params().GetConsensus());
 
     // Sign what we can:
@@ -477,7 +477,6 @@ static void MutateTxSign(CMutableTransaction& tx, const string& strInput)
         BOOST_FOREACH(const CTransaction& txv, txVariants)
             sigdata = CombineSignatures(prevPubKey, MutableTransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i), consensusBranchId);
         UpdateTransaction(mergedTx, i, sigdata);
-
         if (!VerifyScript(txin.scriptSig, prevPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount), consensusBranchId))
             fComplete = false;
     }
@@ -514,7 +513,7 @@ static void MutateTx(CMutableTransaction& tx, const string& command,
         MutateTxLocktime(tx, commandVal);
     else if (command == "expiry")
         MutateTxExpiry(tx, commandVal);
-
+        
     else if (command == "delin")
         MutateTxDelInput(tx, commandVal);
     else if (command == "in")

@@ -9,15 +9,15 @@ from test_framework.util import assert_equal, initialize_chain_clean, \
     start_nodes, connect_nodes_bi, sync_blocks, sync_mempools, \
     wait_and_assert_operationid_status
 
-from decimal import Decimal
+ from decimal import Decimal
 
-class WalletOverwinterTxTest (BitcoinTestFramework):
+ class WalletOverwinterTxTest (BitcoinTestFramework):
 
-    def setup_chain(self):
+     def setup_chain(self):
         print("Initializing test directory "+self.options.tmpdir)
         initialize_chain_clean(self.options.tmpdir, 4)
 
-    def setup_network(self, split=False):
+     def setup_network(self, split=False):
         self.nodes = start_nodes(4, self.options.tmpdir, extra_args=[["-nuparams=5ba81b19:200", "-debug=zrpcunsafe", "-txindex"]] * 4 )
         connect_nodes_bi(self.nodes,0,1)
         connect_nodes_bi(self.nodes,1,2)
@@ -26,13 +26,13 @@ class WalletOverwinterTxTest (BitcoinTestFramework):
         self.is_network_split=False
         self.sync_all()
 
-    def run_test (self):
+     def run_test (self):
         self.nodes[0].generate(100)
         self.sync_all()
         self.nodes[1].generate(98)
         self.sync_all()
         # Node 0 has reward from blocks 1 to 98 which are spendable.
-
+        
         taddr0 = self.nodes[0].getnewaddress()
         taddr1 = self.nodes[1].getnewaddress()
         taddr2 = self.nodes[2].getnewaddress()
@@ -48,12 +48,12 @@ class WalletOverwinterTxTest (BitcoinTestFramework):
         assert_equal(bci['consensus']['nextblock'], '00000000')
         assert_equal(bci['upgrades']['5ba81b19']['status'], 'pending')
 
-        # Node 0 sends transparent funds to Node 2
+         # Node 0 sends transparent funds to Node 2
         tsendamount = Decimal('1.0')
         txid_transparent = self.nodes[0].sendtoaddress(taddr2, tsendamount)
-        self.sync_all()
+         self.sync_all()
 
-        # Node 2 sends the zero-confirmation transparent funds to Node 1 using z_sendmany
+         # Node 2 sends the zero-confirmation transparent funds to Node 1 using z_sendmany
         recipients = []
         recipients.append({"address":taddr1, "amount": Decimal('0.5')})
         myopid = self.nodes[2].z_sendmany(taddr2, recipients, 0)
@@ -65,7 +65,7 @@ class WalletOverwinterTxTest (BitcoinTestFramework):
         recipients.append({"address":zaddr2, "amount": zsendamount})
         myopid = self.nodes[0].z_sendmany(taddr0, recipients)
         txid_shielded = wait_and_assert_operationid_status(self.nodes[0], myopid)
-
+        
         self.sync_all()
         self.nodes[0].generate(1)
         self.sync_all()
@@ -104,14 +104,14 @@ class WalletOverwinterTxTest (BitcoinTestFramework):
         recipients.append({"address":taddr1, "amount": Decimal('0.5')})
         myopid = self.nodes[3].z_sendmany(taddr3, recipients, 0)
         txid_zsendmany = wait_and_assert_operationid_status(self.nodes[3], myopid)
-
+        
         # Node 0 shields to Node 3, a coinbase utxo of value 10.0 less fee 0.00010000
         zsendamount = Decimal('10.0') - Decimal('0.0001')
         recipients = []
         recipients.append({"address":zaddr3, "amount": zsendamount})
         myopid = self.nodes[0].z_sendmany(taddr0, recipients)
         txid_shielded = wait_and_assert_operationid_status(self.nodes[0], myopid)
-
+        
         # Mine the first Overwinter block
         self.sync_all()
         self.nodes[0].generate(1)
@@ -120,7 +120,6 @@ class WalletOverwinterTxTest (BitcoinTestFramework):
         assert_equal(bci['consensus']['chaintip'], '5ba81b19')
         assert_equal(bci['consensus']['nextblock'], '5ba81b19')
         assert_equal(bci['upgrades']['5ba81b19']['status'], 'active')
-
         # Verify balance
         assert_equal(self.nodes[1].z_getbalance(taddr1), Decimal('1.0'))
         assert_equal(self.nodes[3].getbalance(), Decimal('0.4999'))
@@ -140,5 +139,5 @@ class WalletOverwinterTxTest (BitcoinTestFramework):
         assert_equal(result["overwintered"], True)
         assert_equal(result["versiongroupid"], "03c48270")
 
-if __name__ == '__main__':
+ if __name__ == '__main__':
     WalletOverwinterTxTest().main()

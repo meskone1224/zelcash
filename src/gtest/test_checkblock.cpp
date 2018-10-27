@@ -122,28 +122,27 @@ TEST(ContextualCheckBlock, BlockSproutRulesRejectOverwinterTx) {
     mtx.vout.resize(1);
     mtx.vout[0].scriptPubKey = CScript() << OP_TRUE;
     mtx.vout[0].nValue = 0;
-
+    
     mtx.fOverwintered = true;
     mtx.nVersion = 3;
     mtx.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID;
-
+    
     CTransaction tx {mtx};
     CBlock block;
     block.vtx.push_back(tx);
-
+     
     MockCValidationState state;
     CBlockIndex indexPrev {Params().GenesisBlock()};
-
+    
     EXPECT_CALL(state, DoS(100, false, REJECT_INVALID, "tx-overwinter-not-active", false)).Times(1);
     EXPECT_FALSE(ContextualCheckBlock(block, state, &indexPrev));
 }
-
 
 // Test block evaluated under Sprout rules will accept Sprout transactions
 TEST(ContextualCheckBlock, BlockSproutRulesAcceptSproutTx) {
     SelectParams(CBaseChainParams::REGTEST);
     UpdateNetworkUpgradeParameters(Consensus::UPGRADE_OVERWINTER, Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT);
-
+    
     CMutableTransaction mtx;
     mtx.vin.resize(1);
     mtx.vin[0].prevout.SetNull();
@@ -156,18 +155,19 @@ TEST(ContextualCheckBlock, BlockSproutRulesAcceptSproutTx) {
         Params().GetFoundersRewardScriptAtHeight(1)));
     mtx.fOverwintered = false;
     mtx.nVersion = 1;
-
+    
     CTransaction tx {mtx};
     CBlock block;
     block.vtx.push_back(tx);
     MockCValidationState state;
     CBlockIndex indexPrev {Params().GenesisBlock()};
-
+    
     EXPECT_TRUE(ContextualCheckBlock(block, state, &indexPrev));
-
+    
     // Revert to default
     UpdateNetworkUpgradeParameters(Consensus::UPGRADE_OVERWINTER, Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT);
 }
+
 
 
 // Test block evaluated under Overwinter rules will accept Overwinter transactions
@@ -188,16 +188,16 @@ TEST(ContextualCheckBlock, BlockOverwinterRulesAcceptOverwinterTx) {
     mtx.fOverwintered = true;
     mtx.nVersion = 3;
     mtx.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID;
-
+    
     CTransaction tx {mtx};
     CBlock block;
     block.vtx.push_back(tx);
     MockCValidationState state;
     CBlockIndex indexPrev {Params().GenesisBlock()};
-
+    
     EXPECT_TRUE(ContextualCheckBlock(block, state, &indexPrev));
-
-    // Revert to default
+    
+     // Revert to default
     UpdateNetworkUpgradeParameters(Consensus::UPGRADE_OVERWINTER, Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT);
 }
 
@@ -207,7 +207,7 @@ TEST(ContextualCheckBlock, BlockOverwinterRulesAcceptOverwinterTx) {
 TEST(ContextualCheckBlock, BlockOverwinterRulesRejectSproutTx) {
     SelectParams(CBaseChainParams::REGTEST);
     UpdateNetworkUpgradeParameters(Consensus::UPGRADE_OVERWINTER, 1);
-
+    
     CMutableTransaction mtx;
     mtx.vin.resize(1);
     mtx.vin[0].prevout.SetNull();
@@ -215,19 +215,19 @@ TEST(ContextualCheckBlock, BlockOverwinterRulesRejectSproutTx) {
     mtx.vout.resize(1);
     mtx.vout[0].scriptPubKey = CScript() << OP_TRUE;
     mtx.vout[0].nValue = 0;
-
+    
     mtx.nVersion = 2;
-
+    
     CTransaction tx {mtx};
     CBlock block;
     block.vtx.push_back(tx);
-
+    
     MockCValidationState state;
     CBlockIndex indexPrev {Params().GenesisBlock()};
-
+    
     EXPECT_CALL(state, DoS(100, false, REJECT_INVALID, "tx-overwinter-active", false)).Times(1);
     EXPECT_FALSE(ContextualCheckBlock(block, state, &indexPrev));
-
+    
     // Revert to default
     UpdateNetworkUpgradeParameters(Consensus::UPGRADE_OVERWINTER, Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT);
-}
+} 

@@ -101,15 +101,15 @@ public:
         consensus.zawyLWMAHeight = 125000;
         consensus.nZawyLWMAAveragingWindow = 60;
         consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170003;
-        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight=
             Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170003;
-        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
+         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
             Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170004;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
+         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
             Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
-
+            
         /**
          * The message start string should be awesome! ⓩ❤
          */
@@ -186,7 +186,7 @@ public:
 static CMainParams mainParams;
 
 /**
- * Testnet (v4)
+ * Testnet (v5)
  */
 class CTestNetParams : public CChainParams {
 public:
@@ -205,16 +205,16 @@ public:
         consensus.nDigishieldMaxAdjustDown = 32; // 32% adjustment down
         consensus.nDigishieldMaxAdjustUp = 16; // 16% adjustment up
         consensus.nPowTargetSpacing = 2 * 60;
-        consensus.zawyLWMAHeight = 500;
+        consensus.zawyLWMAHeight = 70; //mks
         consensus.nZawyLWMAAveragingWindow = 60;
-        consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170003;
+       consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170003;
         consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
             Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170003;
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
             Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170004;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = 210000;
+                consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = 100;
 
 
         pchMessageStart[0] = 0xfa;
@@ -362,7 +362,6 @@ public:
         base58Prefixes[ZCVIEWING_KEY]      = {0xA8,0xAC,0x0C};
         base58Prefixes[ZCSPENDING_KEY]     = {0xAC,0x08};
     }
-
     void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight)
     {
         assert(idx > Consensus::BASE_SPROUT && idx < Consensus::MAX_NETWORK_UPGRADES);
@@ -442,6 +441,11 @@ std::string CChainParams::GetFoundersRewardAddressAtIndex(int i) const {
     return vFoundersRewardAddress[i];
 }
 
+void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight)
+{
+    regTestParams.UpdateNetworkUpgradeParameters(idx, nActivationHeight);
+}
+
 int validEHparameterList(EHparameters *ehparams, unsigned long blockheight, const CChainParams& params){
     //if in overlap period, there will be two valid solutions, else 1.
     //The upcoming version of EH is preferred so will always be first element
@@ -457,9 +461,4 @@ int validEHparameterList(EHparameters *ehparams, unsigned long blockheight, cons
     ehparams[0]=params.eh_epoch_2_params();
     ehparams[1]=params.eh_epoch_1_params();
     return 2;
-}
-
-void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight)
-{
-    regTestParams.UpdateNetworkUpgradeParameters(idx, nActivationHeight);
 }

@@ -433,7 +433,7 @@ void ThreadShowMetricsScreen()
 
         // Thank you text
         std::cout << _("Thank you for running a Zelcash node!") << std::endl;
-        std::cout << _("You're helping to strengthen the network and contributing to a social good :)") << std::endl;
+        std::cout << _("You're helping to strengthen the network. There is no incentive to run this type of node, so thank you for running one :)") << std::endl;
 
         // Privacy notice text
         std::cout << PrivacyInfo();

@@ -162,7 +162,7 @@ private:
 public:
     int nType;
     int nVersion;
-
+    
     CBLAKE2bWriter(int nTypeIn, int nVersionIn, const unsigned char* personal) : nType(nTypeIn), nVersion(nVersionIn) {
         assert(crypto_generichash_blake2b_init_salt_personal(
             &state,
@@ -176,14 +176,14 @@ public:
         crypto_generichash_blake2b_update(&state, (const unsigned char*)pch, size);
         return (*this);
     }
-
+    
     // invalidates the object
     uint256 GetHash() {
         uint256 result;
         crypto_generichash_blake2b_final(&state, (unsigned char*)&result, 32);
         return result;
     }
-
+    
     template<typename T>
     CBLAKE2bWriter& operator<<(const T& obj) {
         // Serialize to this stream

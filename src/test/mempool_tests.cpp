@@ -108,36 +108,36 @@ BOOST_AUTO_TEST_CASE(MempoolIndexingTest)
     CTxMemPool pool(CFeeRate(0));
     TestMemPoolEntryHelper entry;
     entry.hadNoDependencies = true;
-
-    /* 3rd highest fee */
+    
+     /* 3rd highest fee */
     CMutableTransaction tx1 = CMutableTransaction();
     tx1.vout.resize(1);
     tx1.vout[0].scriptPubKey = CScript() << OP_11 << OP_EQUAL;
     tx1.vout[0].nValue = 10 * COIN;
     pool.addUnchecked(tx1.GetHash(), entry.Fee(10000LL).Priority(10.0).FromTx(tx1));
 
-    /* highest fee */
+     /* highest fee */
     CMutableTransaction tx2 = CMutableTransaction();
     tx2.vout.resize(1);
     tx2.vout[0].scriptPubKey = CScript() << OP_11 << OP_EQUAL;
     tx2.vout[0].nValue = 2 * COIN;
     pool.addUnchecked(tx2.GetHash(), entry.Fee(20000LL).Priority(9.0).FromTx(tx2));
 
-    /* lowest fee */
+     /* lowest fee */
     CMutableTransaction tx3 = CMutableTransaction();
     tx3.vout.resize(1);
     tx3.vout[0].scriptPubKey = CScript() << OP_11 << OP_EQUAL;
     tx3.vout[0].nValue = 5 * COIN;
     pool.addUnchecked(tx3.GetHash(), entry.Fee(0LL).Priority(100.0).FromTx(tx3));
 
-    /* 2nd highest fee */
+     /* 2nd highest fee */
     CMutableTransaction tx4 = CMutableTransaction();
     tx4.vout.resize(1);
     tx4.vout[0].scriptPubKey = CScript() << OP_11 << OP_EQUAL;
     tx4.vout[0].nValue = 6 * COIN;
     pool.addUnchecked(tx4.GetHash(), entry.Fee(15000LL).Priority(1.0).FromTx(tx4));
 
-    /* equal fee rate to tx1, but newer */
+     /* equal fee rate to tx1, but newer */
     CMutableTransaction tx5 = CMutableTransaction();
     tx5.vout.resize(1);
     tx5.vout[0].scriptPubKey = CScript() << OP_11 << OP_EQUAL;
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(MempoolIndexingTest)
     pool.addUnchecked(tx5.GetHash(), entry.Fee(10000LL).FromTx(tx5));
     BOOST_CHECK_EQUAL(pool.size(), 5);
 
-    // Check the fee-rate index is in order, should be tx2, tx4, tx1, tx5, tx3
+     // Check the fee-rate index is in order, should be tx2, tx4, tx1, tx5, tx3
     CTxMemPool::indexed_transaction_set::nth_index<1>::type::iterator it = pool.mapTx.get<1>().begin();
     BOOST_CHECK_EQUAL(it++->GetTx().GetHash().ToString(), tx2.GetHash().ToString());
     BOOST_CHECK_EQUAL(it++->GetTx().GetHash().ToString(), tx4.GetHash().ToString());
@@ -172,12 +172,12 @@ BOOST_AUTO_TEST_CASE(RemoveWithoutBranchId) {
         pool.addUnchecked(tx.GetHash(), entry.BranchId(NetworkUpgradeInfo[Consensus::BASE_SPROUT].nBranchId).FromTx(tx));
     }
     BOOST_CHECK_EQUAL(pool.size(), 10);
-
+    
     // Check the pool only contains Sprout transactions
     for (CTxMemPool::indexed_transaction_set::const_iterator it = pool.mapTx.begin(); it != pool.mapTx.end(); it++) {
         BOOST_CHECK_EQUAL(it->GetValidatedBranchId(), NetworkUpgradeInfo[Consensus::BASE_SPROUT].nBranchId);
     }
-
+    
     // Add some dummy transactions
     for (auto i = 1; i < 11; i++) {
         CMutableTransaction tx = CMutableTransaction();
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(RemoveWithoutBranchId) {
         pool.addUnchecked(tx.GetHash(), entry.BranchId(NetworkUpgradeInfo[Consensus::UPGRADE_TESTDUMMY].nBranchId).FromTx(tx));
     }
     BOOST_CHECK_EQUAL(pool.size(), 20);
-
+    
     // Add some Overwinter transactions
     for (auto i = 1; i < 11; i++) {
         CMutableTransaction tx = CMutableTransaction();
@@ -197,16 +197,16 @@ BOOST_AUTO_TEST_CASE(RemoveWithoutBranchId) {
         pool.addUnchecked(tx.GetHash(), entry.BranchId(NetworkUpgradeInfo[Consensus::UPGRADE_OVERWINTER].nBranchId).FromTx(tx));
     }
     BOOST_CHECK_EQUAL(pool.size(), 30);
-
+    
     // Remove transactions that are not for Overwinter
     pool.removeWithoutBranchId(NetworkUpgradeInfo[Consensus::UPGRADE_OVERWINTER].nBranchId);
     BOOST_CHECK_EQUAL(pool.size(), 10);
-
+    
     // Check the pool only contains Overwinter transactions
     for (CTxMemPool::indexed_transaction_set::const_iterator it = pool.mapTx.begin(); it != pool.mapTx.end(); it++) {
         BOOST_CHECK_EQUAL(it->GetValidatedBranchId(), NetworkUpgradeInfo[Consensus::UPGRADE_OVERWINTER].nBranchId);
     }
-
+    
     // Roll back to Sprout
     pool.removeWithoutBranchId(NetworkUpgradeInfo[Consensus::BASE_SPROUT].nBranchId);
     BOOST_CHECK_EQUAL(pool.size(), 0);

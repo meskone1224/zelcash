@@ -103,11 +103,11 @@ std::uniform_int_distribution<int> version_dist(CTransaction::OVERWINTER_MIN_CUR
                                                 CTransaction::OVERWINTER_MAX_CURRENT_VERSION);
 
 void static RandomTransaction(CMutableTransaction &tx, bool fSingle, uint32_t consensusBranchId) {
-    tx.fOverwintered = insecure_rand() % 2;
+     tx.fOverwintered = insecure_rand() % 2;
     if (tx.fOverwintered) {
-        tx.nVersion = version_dist(rng);
-        tx.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID;
-        tx.nExpiryHeight = (insecure_rand() % 2) ? insecure_rand() : 0;
+    tx.nVersion = version_dist(rng);
+    tx.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID;
+    tx.nExpiryHeight = (insecure_rand() % 2) ? insecure_rand() : 0;
     } else {
         tx.nVersion = insecure_rand() & 0x7FFFFFFF;
     }
@@ -258,13 +258,13 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
           stream >> tx;
 
           CValidationState state;
-          if (tx.fOverwintered) {
-              // Note that OVERWINTER_MIN_CURRENT_VERSION and OVERWINTER_MAX_CURRENT_VERSION
-              // are checked in IsStandardTx(), not in CheckTransactionWithoutProofVerification()
+            if (tx.fOverwintered) {
+            // Note that OVERWINTER_MIN_CURRENT_VERSION and OVERWINTER_MAX_CURRENT_VERSION
+            // are checked in IsStandardTx(), not in CheckTransactionWithoutProofVerification()
               if (tx.nVersion < OVERWINTER_MIN_TX_VERSION ||
                   tx.nExpiryHeight >= TX_EXPIRY_HEIGHT_THRESHOLD)
               {
-                  // Transaction must be invalid
+                    // Transaction must be invalid
                   BOOST_CHECK_MESSAGE(!CheckTransactionWithoutProofVerification(tx, state), strTest);
                   BOOST_CHECK(!state.IsValid());
               } else {

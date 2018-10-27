@@ -1135,7 +1135,6 @@ public:
                           bool ignoreSpent=true,
                           bool ignoreUnspendable=true);
 
-
 };
 
 /** A key allocated from the key pool. */

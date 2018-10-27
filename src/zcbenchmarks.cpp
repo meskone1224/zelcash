@@ -13,6 +13,7 @@
 #include "crypto/equihash.h"
 #include "chain.h"
 #include "chainparams.h"
+#include "consensus/upgrades.h"
 #include "consensus/validation.h"
 #include "main.h"
 #include "miner.h"
@@ -246,8 +247,8 @@ double benchmark_large_tx(size_t nInputs)
     spending_tx.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID;
 
     auto input_hash = orig_tx.GetHash();
-    // Add nInputs inputs
-    for (size_t i = 0; i < nInputs; i++) {
+        // Add nInputs inputs
+        for (size_t i = 0; i < nInputs; i++) {
         spending_tx.vin.emplace_back(input_hash, 0);
     }
 

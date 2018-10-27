@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// file COPYING or http://www.opensource.org/licenses/mit-license.php. 
 
 #include "script/sign.h"
 
@@ -99,7 +99,7 @@ static bool SignStep(const BaseSignatureCreator& creator, const CScript& scriptP
         }
         return true;
     case TX_SCRIPTHASH:
-        if (creator.KeyStore().GetCScript(uint160(vSolutions[0]), scriptRet)) {
+    if (creator.KeyStore().GetCScript(uint160(vSolutions[0]), scriptRet)) {
             ret.push_back(std::vector<unsigned char>(scriptRet.begin(), scriptRet.end()));
             return true;
         }
@@ -108,8 +108,7 @@ static bool SignStep(const BaseSignatureCreator& creator, const CScript& scriptP
     case TX_MULTISIG:
         ret.push_back(valtype()); // workaround CHECKMULTISIG bug
         return (SignN(vSolutions, creator, scriptPubKey, ret, consensusBranchId));
-
-    default:
+     default:
         return false;
     }
 }
@@ -137,7 +136,7 @@ bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& fromPu
     txnouttype whichType;
     solved = SignStep(creator, script, result, whichType, consensusBranchId);
     CScript subscript;
-
+    
     if (solved && whichType == TX_SCRIPTHASH)
     {
         // Solver returns the subscript that needs to be evaluated;
@@ -154,7 +153,7 @@ bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& fromPu
     return solved && VerifyScript(sigdata.scriptSig, fromPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker(), consensusBranchId);
 }
 
-SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nIn)
+ SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nIn)
 {
     SignatureData data;
     assert(tx.vin.size() > nIn);
@@ -162,7 +161,7 @@ SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nI
     return data;
 }
 
-void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn, const SignatureData& data)
+ void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn, const SignatureData& data)
 {
     assert(tx.vin.size() > nIn);
     tx.vin[nIn].scriptSig = data.scriptSig;
@@ -264,14 +263,15 @@ namespace
 struct Stacks
 {
     std::vector<valtype> script;
+    std::vector<valtype> witness;
 
     Stacks() {}
     explicit Stacks(const std::vector<valtype>& scriptSigStack_) : script(scriptSigStack_) {}
     explicit Stacks(const SignatureData& data, uint32_t consensusBranchId) {
         EvalScript(script, data.scriptSig, SCRIPT_VERIFY_STRICTENC, BaseSignatureChecker(), consensusBranchId);
     }
-
-    SignatureData Output() const {
+     
+     SignatureData Output() const {
         SignatureData result;
         result.scriptSig = PushAll(script);
         return result;
@@ -279,7 +279,8 @@ struct Stacks
 };
 }
 
-static Stacks CombineSignatures(const CScript& scriptPubKey, const BaseSignatureChecker& checker,
+ static Stacks CombineSignatures(const CScript& scriptPubKey, const BaseSignatureChecker& checker,
+
                                  const txnouttype txType, const vector<valtype>& vSolutions,
                                  Stacks sigs1, Stacks sigs2, uint32_t consensusBranchId)
 {
@@ -332,7 +333,7 @@ SignatureData CombineSignatures(const CScript& scriptPubKey, const BaseSignature
     vector<vector<unsigned char> > vSolutions;
     Solver(scriptPubKey, txType, vSolutions);
 
-    return CombineSignatures(
+return CombineSignatures(
         scriptPubKey, checker, txType, vSolutions,
         Stacks(scriptSig1, consensusBranchId),
         Stacks(scriptSig2, consensusBranchId),
@@ -346,7 +347,7 @@ class DummySignatureChecker : public BaseSignatureChecker
 public:
     DummySignatureChecker() {}
 
-    bool CheckSig(
+ bool CheckSig(
         const std::vector<unsigned char>& scriptSig,
         const std::vector<unsigned char>& vchPubKey,
         const CScript& scriptCode,

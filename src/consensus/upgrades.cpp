@@ -2,9 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "consensus/upgrades.h"
+ #include "consensus/upgrades.h"
 
-/**
+ /**
  * General information about each network upgrade.
  * Ordered by Consensus::UpgradeIndex.
  */
@@ -18,7 +18,7 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
         /*.nBranchId =*/ 0x74736554,
         /*.strName =*/ "Test dummy",
         /*.strInfo =*/ "Test dummy info",
-    },
+     },
     {
         /*.nBranchId =*/ 0x5ba81b19,
         /*.strName =*/ "Overwinter",
@@ -26,7 +26,7 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
     }
 };
 
-UpgradeState NetworkUpgradeState(
+ UpgradeState NetworkUpgradeState(
     int nHeight,
     const Consensus::Params& params,
     Consensus::UpgradeIndex idx)
@@ -35,25 +35,25 @@ UpgradeState NetworkUpgradeState(
     assert(idx >= Consensus::BASE_SPROUT && idx < Consensus::MAX_NETWORK_UPGRADES);
     auto nActivationHeight = params.vUpgrades[idx].nActivationHeight;
 
-    if (nActivationHeight == Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT) {
+     if (nActivationHeight == Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT) {
         return UPGRADE_DISABLED;
     } else if (nHeight >= nActivationHeight) {
         // From ZIP 200:
         //
         // ACTIVATION_HEIGHT
-        //     The non-zero block height at which the network upgrade rules will come
-        //     into effect, and be enforced as part of the blockchain consensus.
+        //     The non-zero block height at which the ntwork upgrade rules will come 
+        //     into effect, and be enfroced as part of the blockchain consensus.
         //
         //     For removal of ambiguity, the block at height ACTIVATION_HEIGHT - 1 is
         //     subject to the pre-upgrade consensus rules, and would be the last common
-        //     block in the event of a persistent pre-upgrade branch.
+        //     block in the event of a persistent pre-upgrade branch. 
         return UPGRADE_ACTIVE;
     } else {
         return UPGRADE_PENDING;
     }
 }
 
-bool NetworkUpgradeActive(
+ bool NetworkUpgradeActive(
     int nHeight,
     const Consensus::Params& params,
     Consensus::UpgradeIndex idx)
@@ -61,7 +61,7 @@ bool NetworkUpgradeActive(
     return NetworkUpgradeState(nHeight, params, idx) == UPGRADE_ACTIVE;
 }
 
-int CurrentEpoch(int nHeight, const Consensus::Params& params) {
+ int CurrentEpoch(int nHeight, const Consensus::Params& params) {
     for (auto idxInt = Consensus::MAX_NETWORK_UPGRADES - 1; idxInt >= Consensus::BASE_SPROUT; idxInt--) {
         if (NetworkUpgradeActive(nHeight, params, Consensus::UpgradeIndex(idxInt))) {
             return idxInt;
@@ -69,26 +69,26 @@ int CurrentEpoch(int nHeight, const Consensus::Params& params) {
     }
 }
 
-uint32_t CurrentEpochBranchId(int nHeight, const Consensus::Params& params) {
+ uint32_t CurrentEpochBranchId(int nHeight, const Consensus::Params& params) {
     return NetworkUpgradeInfo[CurrentEpoch(nHeight, params)].nBranchId;
 }
 
-bool IsActivationHeight(
+ bool IsActivationHeight(
     int nHeight,
     const Consensus::Params& params,
     Consensus::UpgradeIndex idx)
 {
     assert(idx >= Consensus::BASE_SPROUT && idx < Consensus::MAX_NETWORK_UPGRADES);
 
-    // Don't count Sprout as an activation height
+     // Don't count Sprout as an activation height
     if (idx == Consensus::BASE_SPROUT) {
         return false;
     }
 
-    return nHeight >= 0 && nHeight == params.vUpgrades[idx].nActivationHeight;
+     return nHeight >= 0 && nHeight == params.vUpgrades[idx].nActivationHeight;
 }
 
-bool IsActivationHeightForAnyUpgrade(
+ bool IsActivationHeightForAnyUpgrade(
     int nHeight,
     const Consensus::Params& params)
 {
@@ -96,13 +96,13 @@ bool IsActivationHeightForAnyUpgrade(
         return false;
     }
 
-    // Don't count Sprout as an activation height
+     // Don't count Sprout as an activation height
     for (int idx = Consensus::BASE_SPROUT + 1; idx < Consensus::MAX_NETWORK_UPGRADES; idx++) {
         if (nHeight == params.vUpgrades[idx].nActivationHeight)
             return true;
     }
 
-    return false;
+     return false;
 }
 
 boost::optional<int> NextActivationHeight(
@@ -113,12 +113,12 @@ boost::optional<int> NextActivationHeight(
         return boost::none;
     }
 
-    // Don't count Sprout as an activation height
+     // Don't count Sprout as an activation height
     for (auto idx = Consensus::BASE_SPROUT + 1; idx < Consensus::MAX_NETWORK_UPGRADES; idx++) {
         if (NetworkUpgradeState(nHeight, params, Consensus::UpgradeIndex(idx)) == UPGRADE_PENDING) {
             return params.vUpgrades[idx].nActivationHeight;
         }
     }
 
-    return boost::none;
+     return boost::none;
 }

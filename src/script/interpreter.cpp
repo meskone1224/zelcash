@@ -15,7 +15,6 @@
 #include "uint256.h"
 
 using namespace std;
-
 typedef vector<unsigned char> valtype;
 
 namespace {
@@ -240,6 +239,7 @@ bool EvalScript(
     const BaseSignatureChecker& checker,
     uint32_t consensusBranchId,
     ScriptError* serror)
+
 {
     static const CScriptNum bnZero(0);
     static const CScriptNum bnOne(1);
@@ -1057,17 +1057,17 @@ public:
     }
 };
 
-const unsigned char ZELCASH_PREVOUTS_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
+const unsigned char ZCASH_PREVOUTS_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
     {'Z','c','a','s','h','P','r','e','v','o','u','t','H','a','s','h'};
-const unsigned char ZELCASH_SEQUENCE_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
+const unsigned char ZCASH_SEQUENCE_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
     {'Z','c','a','s','h','S','e','q','u','e','n','c','H','a','s','h'};
-const unsigned char ZELCASH_OUTPUTS_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
+const unsigned char ZCASH_OUTPUTS_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
     {'Z','c','a','s','h','O','u','t','p','u','t','s','H','a','s','h'};
-const unsigned char ZELCASH_JOINSPLITS_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
+const unsigned char ZCASH_JOINSPLITS_HASH_PERSONALIZATION[crypto_generichash_blake2b_PERSONALBYTES] =
     {'Z','c','a','s','h','J','S','p','l','i','t','s','H','a','s','h'};
 
 uint256 GetPrevoutHash(const CTransaction& txTo) {
-    CBLAKE2bWriter ss(SER_GETHASH, 0, ZELCASH_PREVOUTS_HASH_PERSONALIZATION);
+    CBLAKE2bWriter ss(SER_GETHASH, 0, ZCASH_PREVOUTS_HASH_PERSONALIZATION);
     for (unsigned int n = 0; n < txTo.vin.size(); n++) {
         ss << txTo.vin[n].prevout;
     }
@@ -1075,7 +1075,7 @@ uint256 GetPrevoutHash(const CTransaction& txTo) {
 }
 
 uint256 GetSequenceHash(const CTransaction& txTo) {
-    CBLAKE2bWriter ss(SER_GETHASH, 0, ZELCASH_SEQUENCE_HASH_PERSONALIZATION);
+    CBLAKE2bWriter ss(SER_GETHASH, 0, ZCASH_OUTPUTS_HASH_PERSONALIZATION);
     for (unsigned int n = 0; n < txTo.vin.size(); n++) {
         ss << txTo.vin[n].nSequence;
     }
@@ -1083,7 +1083,7 @@ uint256 GetSequenceHash(const CTransaction& txTo) {
 }
 
 uint256 GetOutputsHash(const CTransaction& txTo) {
-    CBLAKE2bWriter ss(SER_GETHASH, 0, ZELCASH_OUTPUTS_HASH_PERSONALIZATION);
+    CBLAKE2bWriter ss(SER_GETHASH, 0, ZCASH_OUTPUTS_HASH_PERSONALIZATION);
     for (unsigned int n = 0; n < txTo.vout.size(); n++) {
         ss << txTo.vout[n];
     }
@@ -1091,7 +1091,7 @@ uint256 GetOutputsHash(const CTransaction& txTo) {
 }
 
 uint256 GetJoinSplitsHash(const CTransaction& txTo) {
-    CBLAKE2bWriter ss(SER_GETHASH, 0, ZELCASH_JOINSPLITS_HASH_PERSONALIZATION);
+    CBLAKE2bWriter ss(SER_GETHASH, 0, ZCASH_JOINSPLITS_HASH_PERSONALIZATION);
     for (unsigned int n = 0; n < txTo.vjoinsplit.size(); n++) {
         ss << txTo.vjoinsplit[n];
     }
@@ -1126,6 +1126,7 @@ uint256 SignatureHash(
     const CAmount& amount,
     uint32_t consensusBranchId,
     const PrecomputedTransactionData* cache)
+
 {
     if (nIn >= txTo.vin.size() && nIn != NOT_AN_INPUT) {
         //  nIn out of range
@@ -1134,37 +1135,36 @@ uint256 SignatureHash(
 
     auto sigversion = SignatureHashVersion(txTo);
 
-    if (sigversion == SIGVERSION_OVERWINTER) {
+     if (sigversion == SIGVERSION_OVERWINTER) {
         uint256 hashPrevouts;
         uint256 hashSequence;
         uint256 hashOutputs;
         uint256 hashJoinSplits;
 
-        if (!(nHashType & SIGHASH_ANYONECANPAY)) {
+         if (!(nHashType & SIGHASH_ANYONECANPAY)) {
             hashPrevouts = cache ? cache->hashPrevouts : GetPrevoutHash(txTo);
         }
 
-        if (!(nHashType & SIGHASH_ANYONECANPAY) && (nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
+         if (!(nHashType & SIGHASH_ANYONECANPAY) && (nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
             hashSequence = cache ? cache->hashSequence : GetSequenceHash(txTo);
         }
 
-        if ((nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
-            hashOutputs = cache ? cache->hashOutputs : GetOutputsHash(txTo);
+         if ((nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
+           hashOutputs = cache ? cache->hashOutputs : GetOutputsHash(txTo); 
         } else if ((nHashType & 0x1f) == SIGHASH_SINGLE && nIn < txTo.vout.size()) {
-            CBLAKE2bWriter ss(SER_GETHASH, 0, ZELCASH_OUTPUTS_HASH_PERSONALIZATION);
+            CBLAKE2bWriter ss(SER_GETHASH, 0, ZCASH_OUTPUTS_HASH_PERSONALIZATION);
             ss << txTo.vout[nIn];
             hashOutputs = ss.GetHash();
         }
-
         if (!txTo.vjoinsplit.empty()) {
             hashJoinSplits = cache ? cache->hashJoinSplits : GetJoinSplitsHash(txTo);
         }
-
+        
         uint32_t leConsensusBranchId = htole32(consensusBranchId);
         unsigned char personalization[16] = {};
-        memcpy(personalization, "ZelcashSigHash", 12);
+        memcpy(personalization, "ZcashSigHash", 12);
         memcpy(personalization+12, &leConsensusBranchId, 4);
-
+        
         CBLAKE2bWriter ss(SER_GETHASH, 0, personalization);
         // Header
         ss << txTo.GetHeader();
@@ -1196,7 +1196,7 @@ uint256 SignatureHash(
             ss << txTo.vin[nIn].nSequence;
         }
 
-        return ss.GetHash();
+         return ss.GetHash();
     }
 
     // Check for invalid use of SIGHASH_SINGLE

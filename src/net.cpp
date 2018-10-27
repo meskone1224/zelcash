@@ -823,7 +823,7 @@ static bool AttemptToEvictConnection(bool fPreferNewConnection) {
 
     const Consensus::Params& params = Params().GetConsensus();
     int nActivationHeight = params.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight;
-
+    
     if (nActivationHeight > 0 &&
         height < nActivationHeight &&
         height >= nActivationHeight - NETWORK_UPGRADE_PEER_PREFERENCE_BLOCK_PERIOD)
@@ -834,7 +834,7 @@ static bool AttemptToEvictConnection(bool fPreferNewConnection) {
                 vTmpEvictionCandidates.push_back(node);
             }
         }
-
+        
         // Prioritize these nodes by replacing eviction set with them
         if (vTmpEvictionCandidates.size() > 0) {
             vEvictionCandidates = vTmpEvictionCandidates;

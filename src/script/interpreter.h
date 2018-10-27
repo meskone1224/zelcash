@@ -90,7 +90,7 @@ enum
 
 struct PrecomputedTransactionData
 {
-    uint256 hashPrevouts, hashSequence, hashOutputs, hashJoinSplits;
+    uint256 hashPrevouts, hashSequence, hashOutputs, hashJoinSplits;;
 
     PrecomputedTransactionData(const CTransaction& tx);
 };
@@ -117,7 +117,7 @@ public:
         const std::vector<unsigned char>& scriptSig,
         const std::vector<unsigned char>& vchPubKey,
         const CScript& scriptCode,
-        uint32_t consensusBranchId) const
+        uint32_t consensusBranchId) const    
     {
         return false;
     }
@@ -135,8 +135,8 @@ class TransactionSignatureChecker : public BaseSignatureChecker
 private:
     const CTransaction* txTo;
     unsigned int nIn;
-    const CAmount amount;
-    const PrecomputedTransactionData* txdata;
+const CAmount amount;
+const PrecomputedTransactionData* txdata;
 
 protected:
     virtual bool VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& vchPubKey, const uint256& sighash) const;

@@ -13,16 +13,16 @@ from test_framework.util import initialize_chain_clean, start_nodes, \
 import time
 
 #
-# In this test we connect Sprout and Overwinter mininodes to a Zelcashd node
+# In this test we connect Sprout and Overwinter mininodes to a ZelCashd node
 # which will activate Overwinter at block 10.
 #
 # We test:
-# 1. the mininodes stay connected to Zelcash with Sprout consensus rules
+# 1. the mininodes stay connected to ZelCash with Sprout consensus rules
 # 2. when Overwinter activates, the Sprout mininodes are dropped
-# 3. new Overwinter nodes can connect to Zelcash
-# 4. new Sprout nodes cannot connect to Zelcash
+# 3. new Overwinter nodes can connect to ZelCash
+# 4. new Sprout nodes cannot connect to ZelCash
 #
-# This test *does not* verify that prior to Overwinter activation, the Zelcashd
+# This test *does not* verify that prior to Overwinter activation, the ZelCashd
 # node will prefer connections with Overwinter nodes, with an eviction process
 # that prioritizes Sprout connections.
 #

@@ -103,10 +103,11 @@ TestingSetup::~TestingSetup()
         boost::filesystem::remove_all(pathTemp);
 }
 
+
 CTxMemPoolEntry TestMemPoolEntryHelper::FromTx(CMutableTransaction &tx, CTxMemPool *pool) {
     return CTxMemPoolEntry(tx, nFee, nTime, dPriority, nHeight,
-                           pool ? pool->HasNoInputsOf(tx) : hadNoDependencies,
-                           spendsCoinbase, nBranchId);
+                        pool ? pool->HasNoInputsOf(tx) : hadNoDependencies,
+                        spendsCoinbase, nBranchId);
 }
 
 void Shutdown(void* parg)

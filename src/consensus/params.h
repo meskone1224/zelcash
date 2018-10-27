@@ -9,7 +9,8 @@
 #include "uint256.h"
 
 namespace Consensus {
-/**
+
+    /**
  * Index into Params.vUpgrades and NetworkUpgradeInfo
  *
  * Being array indices, these MUST be numbered consecutively.
@@ -25,19 +26,17 @@ enum UpgradeIndex {
     // NOTE: Also add new upgrades to NetworkUpgradeInfo in upgrades.cpp
     MAX_NETWORK_UPGRADES
 };
-
-struct NetworkUpgrade {
+ struct NetworkUpgrade {
     /**
      * The first protocol version which will understand the new consensus rules
      */
     int nProtocolVersion;
-
+    
     /**
      * Height of the first block for which the new consensus rules will be active
      */
     int nActivationHeight;
-
-    /**
+     /**
      * Special value for nActivationHeight indicating that the upgrade is always active.
      * This is useful for testing, as it means tests don't need to deal with the activation
      * process (namely, faking a chain of somewhat-arbitrary length).
@@ -47,8 +46,7 @@ struct NetworkUpgrade {
      * satisfies the enabled rules.
      */
     static constexpr int ALWAYS_ACTIVE = 0;
-
-    /**
+     /**
      * Special value for nActivationHeight indicating that the upgrade will never activate.
      * This is useful when adding upgrade code that has a testnet activation height, but
      * should remain disabled on mainnet.

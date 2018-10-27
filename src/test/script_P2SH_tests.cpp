@@ -33,7 +33,7 @@ Serialize(const CScript& s)
 static bool
 Verify(const CScript& scriptSig, const CScript& scriptPubKey, bool fStrict, ScriptError& err)
 {
-    uint32_t consensusBranchId = SPROUT_BRANCH_ID;
+uint32_t consensusBranchId = SPROUT_BRANCH_ID;
 
     // Create dummy to/from transactions:
     CMutableTransaction txFrom;
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(sign)
                 BOOST_CHECK_MESSAGE(!sigOK, strprintf("VerifySignature %d %d", i, j));
             txTo[i].vin[0].scriptSig = sigSave;
         }
-    }
+    }   
 }
 
 BOOST_AUTO_TEST_CASE(norecurse)

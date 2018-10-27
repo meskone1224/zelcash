@@ -41,7 +41,7 @@ from .equihash import (
 
 OVERWINTER_PROTO_VERSION = 170004
 BIP0031_VERSION = 60000
-MY_VERSION = 170003  # past bip-31 for ping/pong
+MY_VERSION = 170002  # past bip-31 for ping/pong
 MY_SUBVERSION = "/python-mininode-tester:0.0.1/"
 
 MAX_INV_SZ = 50000
@@ -874,7 +874,6 @@ class msg_version(object):
             self.nVersion = OVERWINTER_PROTO_VERSION
         else:
             self.nVersion = MY_VERSION
-
         self.nServices = 1
         self.nTime = time.time()
         self.addrTo = CAddress()

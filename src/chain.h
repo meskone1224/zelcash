@@ -146,7 +146,7 @@ public:
     //! Verification status of this block. See enum BlockStatus
     unsigned int nStatus;
 
-    //! Branch ID corresponding to the consensus rules used to validate this block.
+ //! Branch ID corresponding to the consensus rules used to validate this block.
     //! Only cached if block validity is BLOCK_VALID_CONSENSUS.
     //! Persisted at each activation height, memory-only for intervening blocks.
     boost::optional<uint32_t> nCachedBranchId;

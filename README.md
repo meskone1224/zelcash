@@ -1,7 +1,8 @@
-# Zelcash 1.1.0
-INNOVATIVE  INTELLIGENT  INSPIRING
+# Zelcash 1.2.0
 
-Zelcash is a fork of 1.0.14 Zcash aiming to provide decentralised development platform via ZelNodes and ZelTreZ.
+This Branch is for testing...
+
+This branch is a fork of 1.0.15 Zcash aiming to provide decentralised development platform via ZelNodes and ZelCore.
 
 POW asic resistant with Equihash (144,5) also known as Zhash with personalisation string ZelProof. 
 

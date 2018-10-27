@@ -13,6 +13,7 @@ from test_framework.authproxy import JSONRPCException
 from test_framework.util import assert_equal, assert_raises, start_node, connect_nodes
 
 
+
 # Create one-input, one-output, no-fee transaction:
 class MempoolCoinbaseTest(BitcoinTestFramework):
 
@@ -56,7 +57,7 @@ class MempoolCoinbaseTest(BitcoinTestFramework):
         spend_102_raw = self.create_tx(coinbase_txids[2], node0_address, 10)
         spend_103_raw = self.create_tx(coinbase_txids[3], node0_address, 10)
 
-        # Create a block-height-locked transaction which will be invalid after reorg
+         # Create a block-height-locked transaction which will be invalid after reorg
         timelock_tx = self.nodes[0].createrawtransaction([{"txid": coinbase_txids[0], "vout": 0}], {node0_address: 10})
         # Set the time lock
         timelock_tx = timelock_tx.replace("ffffffff", "11111111", 1)
@@ -76,6 +77,7 @@ class MempoolCoinbaseTest(BitcoinTestFramework):
 
         # Broadcast and mine 103_1:
         spend_103_1_id = self.nodes[0].sendrawtransaction(spend_103_1_raw)
+        [spend_103_1_id] # hush pyflakes
         last_block = self.nodes[0].generate(1)
         timelock_tx_id = self.nodes[0].sendrawtransaction(timelock_tx)
 
@@ -85,12 +87,11 @@ class MempoolCoinbaseTest(BitcoinTestFramework):
 
         self.sync_all()
 
-        assert_equal(set(self.nodes[0].getrawmempool()), set([ spend_101_id, spend_102_1_id, timelock_tx_id ]))
-
-        for node in self.nodes:
+         assert_equal(set(self.nodes[0].getrawmempool()), set([ spend_101_id, spend_102_1_id, timelock_tx_id ]))
+         for node in self.nodes:
             node.invalidateblock(last_block[0])
         assert_equal(set(self.nodes[0].getrawmempool()), set([ spend_101_id, spend_102_1_id, spend_103_1_id ]))
-
+        
         # Use invalidateblock to re-org back and make all those coinbase spends
         # immature/invalid:
         for node in self.nodes:

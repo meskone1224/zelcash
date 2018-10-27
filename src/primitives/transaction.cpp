@@ -264,7 +264,7 @@ unsigned int CTransaction::CalculateModifiedSize(unsigned int nTxSize) const
 std::string CTransaction::ToString() const
 {
     std::string str;
-    if (!fOverwintered) {
+     if (!fOverwintered) {
         str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
             GetHash().ToString().substr(0,10),
             nVersion,

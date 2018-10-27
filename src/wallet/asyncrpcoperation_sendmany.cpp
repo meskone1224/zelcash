@@ -60,7 +60,6 @@ AsyncRPCOperation_sendmany::AsyncRPCOperation_sendmany(
         UniValue contextInfo) :
         tx_(contextualTx), fromaddress_(fromAddress), t_outputs_(tOutputs), z_outputs_(zOutputs), mindepth_(minDepth), fee_(fee), contextinfo_(contextInfo)
 {
-    assert(contextualTx.nVersion >= 2);  // transaction format version must support vjoinsplit
     assert(fee_ >= 0);
 
     if (minDepth < 0) {
@@ -338,7 +337,7 @@ bool AsyncRPCOperation_sendmany::main_impl() {
     LogPrint("zrpcunsafe", "%s: private output: %s\n", getId(), FormatMoney(z_outputs_total));
     LogPrint("zrpc", "%s: fee: %s\n", getId(), FormatMoney(minersFee));
 
-        // Grab the current consensus branch ID
+    // Grab the current consensus branch ID
     {
         LOCK(cs_main);
         consensusBranchId_ = CurrentEpochBranchId(chainActive.Height() + 1, Params().GetConsensus());
